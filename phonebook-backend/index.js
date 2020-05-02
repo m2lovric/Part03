@@ -1,4 +1,5 @@
 import express from 'express';
+import morgan from 'morgan';
 
 const app = express();
 
@@ -10,6 +11,19 @@ let persons = [
 ]
 
 app.use(express.json());
+
+const middleware = morgan((tokens, req, res) => {
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, 'content-length'), '-',
+    tokens['response-time'](req, res), 'ms',
+    JSON.stringify(req.body)
+  ].join(' ')
+})
+
+app.use(middleware);
 
 app.get('/', (req, res) => {
   res.send('Phonebook API');
